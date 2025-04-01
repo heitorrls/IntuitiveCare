@@ -1,31 +1,76 @@
--- Criar o banco de dados
 CREATE DATABASE interative_care;
 USE interative_care;
 
--- Tabela para Operadoras
 CREATE TABLE operadoras (
+    registro_ans DECIMAL(7) PRIMARY KEY,
+    cnpj VARCHAR(18) NOT NULL,
+    razao_social VARCHAR(255) NOT NULL,
+    nome_fantasia VARCHAR(255),
+    modalidade VARCHAR(50)
+);
+CREATE TABLE endereco (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    codigo_operadora INT NOT NULL,
+    registro_ans DECIMAL(7),
+    logradouro VARCHAR(255),
+    numero VARCHAR(10),
+    complemento VARCHAR(50),
+    bairro VARCHAR(100),
+    cidade VARCHAR(100),
+    uf CHAR(2),
+    cep VARCHAR(9),
+    FOREIGN KEY (registro_ans) REFERENCES operadoras(registro_ans)
+);
+CREATE TABLE contatos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    registro_ans INT,
+    ddd CHAR(2),
+    telefone VARCHAR(10),
+    fax VARCHAR(10),
+    endereco_eletronico VARCHAR(255),
+    FOREIGN KEY (registro_ans) REFERENCES operadoras(registro_ans)
+);
+CREATE TABLE representantes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    registro_ans INT,
     nome VARCHAR(255),
-    cnpj VARCHAR(20),
-    status_operadora VARCHAR(20),
-    tipo_operadora VARCHAR(50)
-    -- outras colunas se necessário
+    cargo VARCHAR(50),
+    FOREIGN KEY (registro_ans) REFERENCES operadoras(registro_ans)
 );
-
--- Tabela para Demonstracoes Contabeis
-CREATE TABLE demonstracoes_contabeis (
+CREATE TABLE comercializacoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    codigo_operadora INT,
-    ano INT,
-    trimestre INT,
-    eventos_sinistros_conhecidos DECIMAL(15, 2)
-    -- outras colunas conforme necessária
+    registro_ans INT,
+    regiao VARCHAR(255),
+    data_registro_ans DATE,
+    FOREIGN KEY (registro_ans) REFERENCES operadoras(registro_ans)
 );
-LOAD DATA LOCAL INFILE 'C:/Users/Admin/Documents/Processo Seletivo Estagio/banco_de_dados/Relatorio_cadop.csv'
+select * from operadoras;
+SHOW VARIABLES LIKE 'local_infile';
+SET GLOBAL local_infile = 1;
+
+LOAD DATA LOCAL INFILE 'C:\Users\Admin\Documents\processo_seletivo_estagio\banco_de_dados\operadoras_virgula.csv'
 INTO TABLE operadoras
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 LINES
-(codigo_operadora, nome, cnpj, status_operadora, tipo_operadora);
+FIELDS TERMINATED BY ','  -- Ajuste o delimitador conforme necessário
+ENCLOSED BY '"'            -- Ajuste o encapsulador conforme necessário
+LINES TERMINATED BY '\n'   -- Confirme o terminador de linha
+IGNORE 1 LINES             -- Ignora a linha de cabeçalho
+(registro_ans, cnpj, razao_social, nome_fantasia, modalidade);
+
+
+-- Respostas das perguntas
+
+-- 1:
+SELECT * 
+FROM interative_care.comercializacoes
+WHERE cd_conta_contabil = 411  and month(data) in (10, 11, 12) and year(data) = 2024 
+ORDER BY saldo_final DESC
+LIMIT 10;
+-- 411 corresponde a categoria EVENTOS/SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÃŠNCIA Ã€ SAÃšDE
+
+-- 2: 
+SELECT * 
+FROM interative_care.comercializacoes
+WHERE cd_conta_contabil = 411 and year(data) = 2024 
+ORDER BY saldo_final DESC
+LIMIT 10;
+-- 
+
